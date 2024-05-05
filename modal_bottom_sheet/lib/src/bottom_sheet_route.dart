@@ -16,6 +16,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
     this.expanded = false,
     this.enableDrag = true,
     this.animationCurve,
+    this.reverseAnimationCurve,
   });
 
   final double? closeProgressThreshold;
@@ -25,6 +26,7 @@ class _ModalBottomSheet<T> extends StatefulWidget {
   final bool enableDrag;
   final AnimationController? secondAnimationController;
   final Curve? animationCurve;
+  final Curve? reverseAnimationCurve;
 
   @override
   _ModalBottomSheetState<T> createState() => _ModalBottomSheetState<T>();
@@ -112,6 +114,7 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
                 bounce: widget.bounce,
                 scrollController: scrollController,
                 animationCurve: widget.animationCurve,
+                reverseAnimationCurve: widget.reverseAnimationCurve,
               ),
             );
           },
@@ -136,6 +139,7 @@ class ModalSheetRoute<T> extends PageRoute<T> {
     required this.expanded,
     this.bounce = false,
     this.animationCurve,
+    this.reverseAnimationCurve,
     Duration? duration,
     super.settings,
   })  : duration = duration ?? _bottomSheetDuration;
@@ -154,6 +158,7 @@ class ModalSheetRoute<T> extends PageRoute<T> {
 
   final AnimationController? secondAnimationController;
   final Curve? animationCurve;
+  final Curve? reverseAnimationCurve;
 
   @override
   Duration get transitionDuration => duration;
@@ -204,6 +209,7 @@ class ModalSheetRoute<T> extends PageRoute<T> {
         bounce: bounce,
         enableDrag: enableDrag,
         animationCurve: animationCurve,
+        reverseAnimationCurve: reverseAnimationCurve,
       ),
     );
     return bottomSheet;
@@ -240,6 +246,7 @@ Future<T?> showCustomModalBottomSheet<T>({
   bool expand = false,
   AnimationController? secondAnimation,
   Curve? animationCurve,
+  Curve? reverseAnimationCurve,
   bool useRootNavigator = false,
   bool isDismissible = true,
   bool enableDrag = true,
@@ -268,6 +275,7 @@ Future<T?> showCustomModalBottomSheet<T>({
     modalBarrierColor: barrierColor,
     enableDrag: enableDrag,
     animationCurve: animationCurve,
+    reverseAnimationCurve: reverseAnimationCurve,
     duration: duration,
     settings: settings,
     closeProgressThreshold: closeProgressThreshold,
