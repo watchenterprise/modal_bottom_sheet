@@ -172,11 +172,6 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
   void _close() {
     isDragging = false;
 
-    animationCurve = BottomSheetSuspendedCurve(
-      widget.animationController.value,
-      curve: _defaultReverseCurve,
-    );
-
     widget.onClosing();
   }
 
@@ -360,6 +355,21 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
 
     // Todo: Check if we can remove scroll Controller
     super.initState();
+
+    widget.animationController.addStatusListener(_onStatusChanged);
+  }
+
+  void _onStatusChanged(AnimationStatus status) {
+    if (status == AnimationStatus.reverse) {
+      animationCurve = _defaultReverseCurve;
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.animationController.removeStatusListener(_onStatusChanged);
+    super.dispose();
   }
 
   @override
