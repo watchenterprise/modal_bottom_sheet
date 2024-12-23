@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/src/utils/curve_util.dart';
 import 'package:modal_bottom_sheet/src/utils/scroll_to_top_status_bar.dart';
 
 import 'package:modal_bottom_sheet/src/utils/bottom_sheet_suspended_curve.dart';
@@ -174,12 +173,10 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
     isDragging = false;
     widget.onClosing();
 
-    final t = findCurveInverse(
-      _defaultReverseCurve,
+    reverseAnimationCurve = BottomSheetSuspendedCurve(
       widget.animationController.value,
+      curve: _defaultReverseCurve,
     );
-
-    widget.animationController.reverse(from: t);
   }
 
   void _cancelClose() {
