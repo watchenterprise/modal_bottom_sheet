@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/src/utils/curve_util.dart';
 import 'package:modal_bottom_sheet/src/utils/scroll_to_top_status_bar.dart';
 
 import 'package:modal_bottom_sheet/src/utils/bottom_sheet_suspended_curve.dart';
@@ -171,8 +172,14 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
 
   void _close() {
     isDragging = false;
-
     widget.onClosing();
+
+    final t = findCurveInverse(
+      _defaultReverseCurve,
+      widget.animationController.value,
+    );
+
+    widget.animationController.reverse(from: t);
   }
 
   void _cancelClose() {
@@ -198,6 +205,7 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
   }
 
   ParametricCurve<double> animationCurve = Curves.linear;
+  ParametricCurve<double> reverseAnimationCurve = Curves.linear;
 
   void _handleDragUpdate(double primaryDelta) async {
     animationCurve = Curves.linear;
@@ -236,7 +244,7 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
 
     animationCurve = BottomSheetSuspendedCurve(
       widget.animationController.value,
-      curve: _defaultCurve,
+      curve: _defaultReverseCurve,
     );
 
     if (_dismissUnderway || !isDragging) return;
@@ -350,26 +358,12 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
   @override
   void initState() {
     animationCurve = _defaultCurve;
+    reverseAnimationCurve = _defaultReverseCurve;
     _bounceDragController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
 
     // Todo: Check if we can remove scroll Controller
     super.initState();
-
-    widget.animationController.addStatusListener(_onStatusChanged);
-  }
-
-  void _onStatusChanged(AnimationStatus status) {
-    if (status == AnimationStatus.reverse) {
-      animationCurve = _defaultReverseCurve;
-      setState(() {});
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.animationController.removeStatusListener(_onStatusChanged);
-    super.dispose();
   }
 
   @override
@@ -392,7 +386,12 @@ class ModalBottomSheetState extends State<ModalBottomSheet>
       animation: widget.animationController,
       builder: (context, Widget? child) {
         assert(child != null);
-        final animationValue = animationCurve.transform(
+
+        final effectiveCurve = _dismissUnderway && !isDragging
+            ? reverseAnimationCurve
+            : animationCurve;
+
+        final animationValue = effectiveCurve.transform(
           widget.animationController.value,
         );
 
